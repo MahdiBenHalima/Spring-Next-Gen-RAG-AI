@@ -1,0 +1,29 @@
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+# Private tender documents and generated outputs
+data/private/
+data/uploads/
+storage/
+uploads/
+outputs/
+*.sqlite3
+*.db
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
