@@ -92,7 +92,9 @@ Spring-Next-Gen-RAG-AI/
 │   ├── fusion.py          # Hybrid result fusion and reranking
 │   ├── adapters.py        # Ollama, pgvector and CrossEncoder adapters
 │   ├── pipeline.py        # Retrieval orchestration
+│   ├── hybrid.py          # Optional service-backed RAG QA
 │   ├── structured_llm.py  # Typed LLM requirement extraction
+│   ├── llm_workflow.py    # Structured LLM technical/resource/risk review
 │   ├── workflow.py        # End-to-end fictional RFP review workflow
 │   ├── analysis.py        # Lightweight analysis helpers
 │   ├── reports.py         # PDF review report
@@ -141,6 +143,7 @@ The CLI uses fictional procurement text and user-specified example rates. It pri
 | `POST` | `/demo/analyze` | BM25 evidence search and lightweight demonstration |
 | `POST` | `/api/v1/workflow/analyze` | Synthetic end-to-end RFP review (requirements, technical, resources, finance, risks, human decision) |
 | `POST` | `/api/v1/workflow/report.pdf` | Download a PDF report for the public workflow |
+| `POST` | `/api/v1/llm/review` | Optional Ollama-backed structured technical/resource/risk analysis from evidence |
 
 Example:
 
@@ -169,6 +172,7 @@ Configure PostgreSQL with the **pgvector extension**, set `DATABASE_URL` and any
 - `rfp_ai.adapters.answer_with_ollama` — grounded question answering.
 - `rfp_ai.hybrid.index_text` and `rfp_ai.hybrid.ask_hybrid` — opt-in service-backed ingestion and hybrid retrieval + LLM response.
 - `rfp_ai.structured_llm.extract_structured_tender` — schema-validated extraction using a caller-provided LLM function.
+- `rfp_ai.llm_workflow.analyze_with_ollama` — optional multi-stage structured LLM review with evidence-ID validation and human approval.
 
 These are **integration components, not an automatically deployed service**. They require an external database and models and are not exercised by the offline CI matrix. An evaluation dataset and system-level integration tests are needed before claiming retrieval or decision accuracy.
 
