@@ -44,3 +44,40 @@ def analyze(request: AnalysisRequest) -> dict:
         ],
         "assessment": assessment.to_dict(),
     }
+
+
+# Portfolio workflow additions. These endpoints use independent, fictional demo rules.
+from io import BytesIO
+from fastapi.responses import StreamingResponse
+from .workflow import analyze_workflow
+
+
+class WorkflowRequest(BaseModel):
+    tender_id: str = Field(min_length=1, max_length=100)
+    document_text: str = Field(min_length=1, max_length=100_000)
+    daily_rates: dict[str, float] = Field(default_factory=dict)
+    available_skills: list[str] | None = None
+    budget_cap: float | None = Field(default=None, ge=0)
+
+
+@app.post("/api/v1/workflow/analyze")
+def workflow_analysis(request: WorkflowRequest) -> dict:
+    return analyze_workflow(
+        request.document_text,
+        request.tender_id,
+        daily_rates=request.daily_rates,
+        available_skills=request.available_skills,
+        budget_cap=request.budget_cap,
+    ).as_dict()
+
+
+@app.post("/api/v1/workflow/report.pdf")
+def workflow_pdf(request: WorkflowRequest) -> StreamingResponse:
+    from .reports import pdf_report
+    result = workflow_analysis(request)
+    output = pdf_report(result)
+    return StreamingResponse(
+        BytesIO(output),
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="rfp-review-demo.pdf"'},
+    )
