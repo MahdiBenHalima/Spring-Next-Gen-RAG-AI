@@ -1,32 +1,35 @@
-# Traceability to the private Spring Next Gen implementation
+# Engineering provenance and scope
 
-This document records what was actually inspected in the connected private GitHub repository and how the portfolio reconstruction differs. It is **not** permission to redistribute employer-owned source code.
+This document explains which features of the original Spring Next Gen architecture were inspected and how they are represented in the independent public implementation. No private source file was copied verbatim into this repository.
 
-## Inspected original paths (private; not linked publicly)
+| Capability in original private Python project | Public implementation | Scope |
+|---|---|---|
+| Multi-format document extraction | `src/rfp_ai/ingestion.py` | TXT, MD, PDF, DOCX and PPTX |
+| Chunking with tender/document metadata | `src/rfp_ai/chunking.py` | Source-aware segmentation |
+| BM25 lexical retrieval | `src/rfp_ai/bm25.py` | In-memory, tender-filtered search |
+| Ollama embeddings + PGVector | `src/rfp_ai/adapters.py` | Optional external services |
+| Combined vector/BM25 retrieval | `src/rfp_ai/pipeline.py`, `fusion.py` | Independent RRF fusion |
+| CrossEncoder reranking | `src/rfp_ai/adapters.py`, `fusion.py` | Optional model |
+| Ollama question answering | `src/rfp_ai/adapters.py`, `hybrid.py` | Optional evidence-grounded generation |
+| LLM JSON extraction for requirements | `src/rfp_ai/structured_llm.py` | Independent typed extraction interface |
+| Technical, risk and resource modules | `src/rfp_ai/workflow.py` | Explainable example logic, no private company rules |
+| Financial estimation and Go/No-Go | `src/rfp_ai/workflow.py` | Illustrative inputs and mandatory human review |
+| PDF generation | `src/rfp_ai/reports.py` | Reconstructed PDF report |
+| FastAPI routes | `src/rfp_ai/api.py` | Standalone public API |
 
-| Original path under `Next_Gen/` | Observed mechanism | Public counterpart | Status |
-|---|---|---|---|
-| `app/retrieval/chunking_service.py` | Recursive character segmentation; 1200 size / 200 overlap; tender/document/chunk metadata | `src/rfp_ai/chunking.py` | Independently reimplemented |
-| `app/retrieval/bm25_service.py` | `rank_bm25.BM25Okapi` and simple lexical tokenization | `src/rfp_ai/bm25.py` | Independently reimplemented |
-| `app/retrieval/vector_service.py` | OllamaEmbeddings and PostgreSQL PGVector with tender-ID filtering | `src/rfp_ai/adapters.py` | Optional integration reconstructed |
-| `app/retrieval/reranker_service.py` | CrossEncoder `ms-marco-MiniLM-L-6-v2` reranks de-duplicated candidates | `src/rfp_ai/fusion.py` and `adapters.py` | Optional integration reconstructed |
-| `app/retrieval/rag_service.py` | BM25 + semantic retrieval, reranking and prompt context | `src/rfp_ai/pipeline.py` | Independently reimplemented; RRF is new |
-| `app/retrieval/llm_extraction_service.py` | Local Ollama chat, prompt-based extraction and JSON parsing | `src/rfp_ai/adapters.py` | Context-answering adapter only; structured extraction not duplicated |
-| `app/agents/requirements/service.py` | RAG context passed through LLM prompt and typed JSON schema | README and architecture docs | Documented, not ported |
-| `app/agents/technical/analysis_service.py` | Ollama LLM, JSON output parser, normalization, Pydantic validation | README and architecture docs | Documented, not ported |
-| `app/agents/go_no_go/service.py` | Combine technical, resource, budget and risk outputs, use business context/scoring and persist result | `src/rfp_ai/analysis.py` | Simplified, safe demo; no claim of decision parity |
-| `app/main.py` | FastAPI application with route mounting | `src/rfp_ai/api.py` | Independent minimal endpoints |
-| `requirements.txt` | Lists FastAPI, LangChain, pgvector and other dependencies | `pyproject.toml` | Reproducible package declaration updated for public demo |
+## Scope boundaries
 
-## Explicit differences
+The original intern project used dedicated analysis modules with LLM-generated structured results and organization-specific decision policies. In the public demonstration, workflow estimates and risk observations are **simplified example algorithms**. They are not the employer's algorithms, pricing policies, output schema or validated production results. The optional Ollama adapters and structured extraction provide technical integration points but have not been benchmarked against the private system.
 
-1. The original retrieval workflow obtains the BM25 candidate pool from a limited vector-store similarity search; the public demo uses an in-memory BM25 corpus, and can optionally query pgvector. These are **not** equivalent retrieval experiments.
-2. Reciprocal rank fusion (RRF) is a documented **public-demo addition**, not a claim about the private algorithm.
-3. The demo's keyword detection is **not** the original LLM-driven requirements/technical analysis.
-4. The public demonstration does not contain proprietary costing rules, customer rates, company profiles, SQL data, private prompts or PDF output templates.
-5. No accuracy, precision, retrieval recall, decision quality or business ROI results are claimed because no comparable evaluation set was supplied.
-6. The upstream private implementation was inspected for technical correspondence only; this public code was created independently for portfolio use and requires review of employer/IP obligations.
+Internal tender documents, private business data, application integrations, original prompts and other restricted assets remain unpublished because they are associated with the organization. This independent implementation is intended to demonstrate the engineering methods without revealing them.
 
-## What to validate before citing in a CV
+## Evidence reviewed (private repository)
 
-The CV may accurately refer to internship work on hybrid RAG, LLM analysis, FastAPI integration and Go/No-Go support. Link this public repository as an **independent portfolio reconstruction** illustrating key methods, not as a complete public release of the production internship application.
+The original design was checked against `Next_Gen/app/retrieval/`, `Next_Gen/app/agents/`, `Next_Gen/app/api/`, `Next_Gen/app/common/report_generator.py` and the private dependency/configuration files. The private repository is not referenced by a public hyperlink. This statement records an architectural review, **not** permission to redistribute underlying materials.
+
+## Reproducibility
+
+- Offline workflows use synthetic text and fictional rate inputs.
+- GitHub Actions runs Python package compilation, tests, a synthetic demonstration and PDF output checks.
+- PostgreSQL, pgvector, Ollama and CrossEncoder require separate opt-in integration setup.
+- No quantitative performance or commercial outcome parity with the private system is claimed.
