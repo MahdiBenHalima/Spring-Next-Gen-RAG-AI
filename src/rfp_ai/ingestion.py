@@ -21,14 +21,14 @@ def read_document(path: str | Path) -> str:
         except ImportError as exc:
             raise RuntimeError("Install the PDF/document extra: pip install -e '.[pdf]'") from exc
         doc = Document(path)
-        return "\\n".join(paragraph.text for paragraph in doc.paragraphs if paragraph.text.strip())
+        return "\n".join(paragraph.text for paragraph in doc.paragraphs if paragraph.text.strip())
     if path.suffix.lower() == ".pptx":
         try:
             from pptx import Presentation
         except ImportError as exc:
             raise RuntimeError("Install the PDF/document extra: pip install -e '.[pdf]'") from exc
         presentation = Presentation(path)
-        return "\\n".join(
+        return "\n".join(
             shape.text for slide in presentation.slides for shape in slide.shapes
             if shape.has_text_frame and shape.text.strip()
         )
