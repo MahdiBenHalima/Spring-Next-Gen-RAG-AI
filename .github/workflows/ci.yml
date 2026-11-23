@@ -1,0 +1,30 @@
+name: Validate public Hybrid RAG portfolio
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package and offline-test dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Compile Python package
+        run: python -m compileall -q src
+      - name: Run offline unit and API tests
+        run: python -m pytest -q
+      - name: Run synthetic example
+        run: python -m rfp_ai.demo
