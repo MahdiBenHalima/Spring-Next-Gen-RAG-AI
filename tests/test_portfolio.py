@@ -21,7 +21,7 @@ def corpus():
 
 
 def test_chunking_preserves_metadata_and_overlap():
-    data = chunk_text("some meaningful words " * 30, tender_id="A", document_id="d")
+    data = chunk_text("some meaningful words " * 30, tender_id="A", document_id="d", chunk_size=80, overlap=10)
     assert len(data) > 1
     assert all(x.tender_id == "A" and x.document_id == "d" for x in data)
     assert len({x.chunk_id for x in data}) == len(data)
