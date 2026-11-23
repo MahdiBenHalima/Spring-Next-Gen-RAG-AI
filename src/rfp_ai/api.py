@@ -81,3 +81,24 @@ def workflow_pdf(request: WorkflowRequest) -> StreamingResponse:
         media_type="application/pdf",
         headers={"Content-Disposition": 'attachment; filename="rfp-review-demo.pdf"'},
     )
+
+
+class LlmEvidence(BaseModel):
+    chunk_id: str = Field(min_length=1, max_length=200)
+    excerpt: str = Field(min_length=1, max_length=15000)
+
+
+class LlmReviewRequest(BaseModel):
+    evidence: list[LlmEvidence] = Field(min_length=1, max_length=50)
+
+
+@app.post("/api/v1/llm/review")
+def llm_review(request: LlmReviewRequest) -> dict:
+    """Optional, real Ollama-backed structured analysis; runs only when invoked.
+
+    This development endpoint is unauthenticated and must not be exposed publicly
+    with sensitive customer data.
+    """
+    from .llm_workflow import analyze_with_ollama
+    items = [entry.model_dump() for entry in request.evidence]
+    return analyze_with_ollama(items).model_dump()
