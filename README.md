@@ -167,6 +167,7 @@ Configure PostgreSQL with the **pgvector extension**, set `DATABASE_URL` and any
 - `rfp_ai.pipeline.retrieve` — combine semantic and BM25 candidates.
 - `rfp_ai.adapters.cross_encoder_scoring` — optional CrossEncoder reranking.
 - `rfp_ai.adapters.answer_with_ollama` — grounded question answering.
+- `rfp_ai.hybrid.index_text` and `rfp_ai.hybrid.ask_hybrid` — opt-in service-backed ingestion and hybrid retrieval + LLM response.
 - `rfp_ai.structured_llm.extract_structured_tender` — schema-validated extraction using a caller-provided LLM function.
 
 These are **integration components, not an automatically deployed service**. They require an external database and models and are not exercised by the offline CI matrix. An evaluation dataset and system-level integration tests are needed before claiming retrieval or decision accuracy.
