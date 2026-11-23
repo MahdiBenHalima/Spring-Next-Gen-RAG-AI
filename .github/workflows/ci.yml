@@ -21,10 +21,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install package and offline-test dependencies
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,reports]"
       - name: Compile Python package
         run: python -m compileall -q src
       - name: Run offline unit and API tests
         run: python -m pytest -q
       - name: Run synthetic example
-        run: python -m rfp_ai.demo
+        run: |
+          python -m rfp_ai.demo
+          python -m rfp_ai.cli --pdf outputs/ci-demo.pdf
