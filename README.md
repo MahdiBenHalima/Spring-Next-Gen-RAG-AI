@@ -1,95 +1,190 @@
-# Spring Next Gen — Hybrid RAG & AI for RFP Analysis
+# Spring Next Gen — Intelligent RFP Analysis Platform
 
-**Independent, open portfolio reconstruction** of selected AI engineering concepts implemented during a two-month Spring Next Gen internship (2026). This repository **does not contain the complete internship platform**, customer tenders, private business rules, Angular UI, or Spring Boot code. It was authored anew as a small, inspectable Python demonstration after examining the architecture of the private project. The actual original implementation is not open sourced here.
+**Hybrid RAG • Local LLMs • AI-Powered Tender Analysis • Decision Support • FastAPI**
 
-## Engineering scope and CV correspondence
+[![Python CI](https://github.com/MahdiBenHalima/Spring-Next-Gen-RAG-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/MahdiBenHalima/Spring-Next-Gen-RAG-AI/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688)
+![RAG](https://img.shields.io/badge/AI-Hybrid%20RAG-purple)
+![LLMs](https://img.shields.io/badge/LLM-Ollama-orange)
 
-| CV capability | Confirmed in private Python project | Public representation |
-|---|---|---|
-| RFP document processing and chunking | PDF/text extraction and RecursiveCharacterTextSplitter with 1,200-character chunks/200 overlap | Independent text/PDF ingestion and overlapping source-aware chunks |
-| Hybrid RAG | PGVector semantic retrieval + BM25 candidate retrieval + CrossEncoder reranking | BM25, injectable vector retrieval, reciprocal-rank fusion and injectable reranking |
-| Local LLMs | Ollama ChatOllama, Qwen3:8b configured, mxbai-embed-large embeddings configured | Optional adapters for Ollama/PGVector; not required for offline demo |
-| Requirements extraction | Dedicated requirements module, prompt and JSON validation | Demonstrated concept in architecture; lightweight heuristic example is **not** equivalent |
-| Technical, risk and resource analysis | Private `app/agents/technical`, `risk_analysis`, `resource_estimation` modules | Documented architecture and evidence-based example; proprietary logic excluded |
-| Financial estimation and Go/No-Go | Private financial and Go/No-Go scoring services | Transparent cost arithmetic; decision stays `HUMAN_REVIEW_REQUIRED` |
-| FastAPI integration | Private FastAPI routes and backend integrations | Independent `/health` and `/demo/analyze` endpoints |
-| PDF reporting | Private PDF report generator | Documented; **not implemented** in this minimal public reconstruction |
+> **Project overview:** An AI engineering project for transforming unstructured request-for-proposal (RFP) documents into searchable evidence, structured requirements, technical and risk observations, resource and financial estimates, and reviewable Go/No-Go recommendations.
+>
+> Developed in the context of an **AI & LLM Engineering internship at Spring Next Gen (2026)**. This repository provides an **independently implemented, public technical showcase** of the methods and workflow. Certain original application components, internal rules, datasets and business integrations remain private to the organization.
 
-**Terminology:** The private code uses `agents/` as modules for task-specific analysis. No LangGraph orchestration or autonomous tool-using multi-agent system is claimed for this internship project.
+## Project highlights
+
+- **Document Intelligence:** extract information from PDF, DOCX, PPTX or plain-text documents, then segment text into identifiable chunks.
+- **Hybrid Retrieval-Augmented Generation:** combine lexical BM25 and semantic pgvector retrieval, merge candidates and optionally rerank with a CrossEncoder.
+- **Local LLMs:** Ollama integration for context-grounded question answering; optional structured JSON extraction with Pydantic validation and evidence-ID checking.
+- **RFP Analysis:** a modular workflow for requirements identification, technical observations, resource estimation, financial calculations and risk flags.
+- **Go/No-Go Decision Support:** explainable recommendations designed for **human approval**, not autonomous tender submission.
+- **PDF Reporting:** an optional review report generated from the public workflow.
+- **API & Testing:** FastAPI endpoints, synthetic examples, isolated unit/API tests and automated CI.
 
 ## Architecture
 
 ```text
-Original private project (verified high-level components)
-PDF/text --> parsing --> chunking --> Ollama embeddings --> PostgreSQL / pgvector
-                                               |                  |
-User query --------------------------- BM25 retrieval      vector search
-                                               \                  /
-                                                CrossEncoder reranking
-                                                         |
-                                               Context + Ollama LLM
-                                                         |
-                                  Requirement / Technical / Risk / Resources
-                                                         |
-                                        Business rules / Financial / Go-No-Go
-                                                         |
-                                                 FastAPI / PDF report
-
-This PUBLIC repository (independent implementation)
-text/PDF --> chunking --> BM25 ----+--> rank fusion --> optional reranker
-                     optional pgvector search -------+
-                                               |
-                                     evidence + heuristic review
-                                               |
-                                         FastAPI / CLI demo
+               RFP / Tender Documents
+                 PDF · DOCX · PPTX
+                         │
+               Document Intelligence
+             extraction + text chunking
+                         │
+                Evidence / Metadata
+                         │
+          ┌──────────────┴──────────────┐
+          │                             │
+       BM25 Search              Semantic Search
+     (keyword matching)       (Ollama embeddings)
+          │                             │
+          │                       PostgreSQL + pgvector
+          │                             │
+          └──────────────┬──────────────┘
+                         │
+               Hybrid Retrieval / Fusion
+                         │
+                CrossEncoder Reranking
+                         │
+                 Evidence Context
+                         │
+              Local LLM / Structured JSON
+                         │
+            ┌────────────┴────────────┐
+            │                         │
+     Requirement Extraction     Technical Evaluation
+            │                         │
+            ├── Resource Estimation    │
+            ├── Financial Estimation   │
+            └── Risk Analysis ─────────┘
+                         │
+              Go / No-Go Review
+                         │
+               PDF / FastAPI Outputs
+                         │
+               Human Validation
 ```
 
-The optional adapters connect to Ollama and PGVector when services are configured. **The default CLI/API demo runs BM25 only**, does not invoke a language model, and is not a production procurement decision system.
+**Implementation note:** The architecture above describes the overall internship solution and the independently reconstructed public modules. The **offline demo** uses BM25 plus transparent example business logic; LLM, vector database and CrossEncoder integrations are optional and require local services. No private prompts, company data or internal pricing logic are reproduced.
 
-## Quick start (Python 3.10+)
+## Technology stack
+
+| Layer | Technologies | Purpose |
+|---|---|---|
+| Backend / API | Python, FastAPI, Pydantic | Typed requests and service endpoints |
+| RAG orchestration | LangChain-compatible adapters | Query routing and evidence retrieval |
+| Lexical retrieval | BM25 / `rank-bm25` | Exact-term relevance |
+| Semantic retrieval | Ollama embeddings, PostgreSQL / pgvector | Contextual similarity search |
+| Reranking | Sentence Transformers CrossEncoder | Context-specific candidate ranking |
+| LLM | Ollama (e.g., Qwen3) | Grounded answers and structured extraction |
+| Document processing | PyMuPDF, python-docx, python-pptx | PDF, Word and PowerPoint text extraction |
+| Reports | ReportLab | PDF review report generation |
+| Quality | pytest, GitHub Actions | Reproducible offline tests |
+
+## Repository layout
+
+```text
+Spring-Next-Gen-RAG-AI/
+├── src/rfp_ai/
+│   ├── ingestion.py       # Local document extraction
+│   ├── chunking.py        # Document segmentation and chunk metadata
+│   ├── bm25.py            # Lexical retrieval
+│   ├── fusion.py          # Hybrid result fusion and reranking
+│   ├── adapters.py        # Ollama, pgvector and CrossEncoder adapters
+│   ├── pipeline.py        # Retrieval orchestration
+│   ├── structured_llm.py  # Typed LLM requirement extraction
+│   ├── workflow.py        # End-to-end fictional RFP review workflow
+│   ├── analysis.py        # Lightweight analysis helpers
+│   ├── reports.py         # PDF review report
+│   ├── api.py             # FastAPI routes
+│   ├── cli.py             # Full synthetic workflow CLI
+│   └── demo.py            # Standalone retrieval demo
+├── tests/                 # Offline unit and API tests
+├── docs/                  # Architecture and security notes
+├── .github/workflows/     # CI validation
+├── .env.example
+├── pyproject.toml
+└── README.md
+```
+
+## Getting started
+
+Requirements: **Python 3.10+**. The basic demo runs without an LLM, PostgreSQL or model downloads.
 
 ```bash
+git clone https://github.com/MahdiBenHalima/Spring-Next-Gen-RAG-AI.git
+cd Spring-Next-Gen-RAG-AI
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-python -m pip install -e ".[dev]"
-python -m rfp_ai.demo
-pytest -q
+```
+
+Activate the environment:
+
+- **Windows PowerShell:** `.venv\Scripts\Activate.ps1`
+- **Linux/macOS:** `source .venv/bin/activate`
+
+Install and run:
+
+```bash
+python -m pip install -e ".[dev,reports]"
+python -m rfp_ai.cli --pdf outputs/synthetic-review.pdf
+python -m pytest -q
 uvicorn rfp_ai.api:app --reload
 ```
 
-Then visit `http://127.0.0.1:8000/docs`.
+The CLI uses fictional procurement text and user-specified example rates. It prints a JSON analysis and saves a PDF under `outputs/` (ignored by Git). API documentation is available at **http://127.0.0.1:8000/docs**.
 
-### Example request
+### API endpoints
+
+| Method | Endpoint | Behavior |
+|---|---|---|
+| `GET` | `/health` | Health status |
+| `POST` | `/demo/analyze` | BM25 evidence search and lightweight demonstration |
+| `POST` | `/api/v1/workflow/analyze` | Synthetic end-to-end RFP review (requirements, technical, resources, finance, risks, human decision) |
+| `POST` | `/api/v1/workflow/report.pdf` | Download a PDF report for the public workflow |
+
+Example:
 
 ```bash
-curl -X POST http://127.0.0.1:8000/demo/analyze \
+curl -X POST http://127.0.0.1:8000/api/v1/workflow/analyze \
   -H "Content-Type: application/json" \
-  -d '{"tender_id":"SYNTHETIC-001","document_text":"A fictional customer requires REST API integration and a security audit.","question":"What integration is required?","person_days":20,"daily_rate":400}'
+  -d '{"tender_id":"DEMO-001","document_text":"REST API integration, security audit and documentation. Deadline December 20.","daily_rates":{"Backend engineer":400,"Security engineer":500,"Technical writer":200},"available_skills":["Backend engineer","Security engineer","Technical writer"],"budget_cap":20000}'
 ```
 
-The response includes evidence chunk IDs and the explicitly non-automated outcome `HUMAN_REVIEW_REQUIRED`.
+The workflow returns evidence-linked requirements, transparent effort/cost computations, observed risk flags and `HUMAN_REVIEW_REQUIRED`. **Rates, roles and efforts are invented demonstration assumptions, not real company estimates.**
 
-## Optional real hybrid retrieval
+## Enabling the optional Hybrid RAG + LLM stack
 
 ```bash
-python -m pip install -e ".[rag,pdf,dev]"
-cp .env.example .env
-# Set DATABASE_URL in your environment (local PostgreSQL with pgvector enabled)
-# Start Ollama and pull compatible models:
+python -m pip install -e ".[rag,pdf,reports,dev]"
 ollama pull qwen3:8b
 ollama pull mxbai-embed-large
 ```
 
-The `rfp_ai.adapters` module exposes `index_in_pgvector`, `search_pgvector`, `cross_encoder_scoring` and `answer_with_ollama`. Combine the adapters with `rfp_ai.pipeline.retrieve` for a real service-backed hybrid run. These optional integrations are **not validated by offline GitHub Actions**; they require PostgreSQL, pgvector, Ollama and external model artifacts. A separate integration test environment is required for reproducible end-to-end validation.
+Configure PostgreSQL with the **pgvector extension**, set `DATABASE_URL` and any relevant `OLLAMA_*` variables (see `.env.example`), then use:
 
-## Tests and safety
+- `rfp_ai.adapters.index_in_pgvector` — embed and store permitted documents.
+- `rfp_ai.adapters.search_pgvector` — tenant-filtered semantic retrieval.
+- `rfp_ai.pipeline.retrieve` — combine semantic and BM25 candidates.
+- `rfp_ai.adapters.cross_encoder_scoring` — optional CrossEncoder reranking.
+- `rfp_ai.adapters.answer_with_ollama` — grounded question answering.
+- `rfp_ai.structured_llm.extract_structured_tender` — schema-validated extraction using a caller-provided LLM function.
 
-- Offline pytest tests cover chunk metadata, retrieval isolation, RRF deduplication, reranking, costs, API validation and human-review status.
-- `.github/workflows/ci.yml` executes the package installation, compilation and tests without network model calls.
-- All demo inputs are fictional. Do **not** add customer tenders, private PDFs, database dumps, passwords or production model caches.
-- The published repository is **not** an exact copy of internship code, not a validated production deployment, and not an autonomous bidding agent.
+These are **integration components, not an automatically deployed service**. They require an external database and models and are not exercised by the offline CI matrix. An evaluation dataset and system-level integration tests are needed before claiming retrieval or decision accuracy.
 
-See [TRACEABILITY.md](TRACEABILITY.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/SECURITY.md](docs/SECURITY.md).
+## Quality and reproducibility
 
-**Keywords:** Python · Hybrid RAG · Retrieval-Augmented Generation · BM25 · pgvector · Ollama · CrossEncoder · LLM · FastAPI · RFP Analysis · Go/No-Go
+GitHub Actions checks **Python 3.10, 3.11 and 3.12**, compiling the package and executing offline tests with no credentials or AI model downloads. Tests cover evidence IDs, tender isolation, BM25 retrieval, hybrid rank fusion, reranker injection, schema validation, synthetic workflow estimates, safety guards and API behavior.
+
+[View CI runs](https://github.com/MahdiBenHalima/Spring-Next-Gen-RAG-AI/actions)
+
+## Project scope and confidentiality
+
+The implementation demonstrates the **engineering approach** used in a wider tender-analysis platform. Some original modules, organization-specific knowledge, pricing policies, internal business data, documents, prompts and Angular/Spring Boot integrations are not available publicly because they belong to the project organization. The code here is intentionally **reconstructed**, not copied from the internal repository.
+
+The public analysis is a **technical portfolio demonstration** and must not be treated as a production decision engine or proof of accuracy. All procurement decisions require human review.
+
+---
+
+**Focus areas:** AI Engineering · Hybrid RAG · Local LLMs · Document Intelligence · Semantic Search · Technical and Risk Analysis · FastAPI · Explainable Decision Support
+
+**Author:** [Mahdi Ben Halima](https://github.com/MahdiBenHalima) · **Project:** Spring Next Gen, 2026
