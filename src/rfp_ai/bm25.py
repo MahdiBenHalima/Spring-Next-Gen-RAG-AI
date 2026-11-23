@@ -19,7 +19,7 @@ class BM25Index:
         scores = self._bm25.get_scores(tokenize(question))
         ranked = sorted(
             ((chunk, float(score)) for chunk, score in zip(self.chunks, scores)
-             if chunk.tender_id == tender_id and score > 0),
+             if chunk.tender_id == tender_id and set(tokenize(question)) & set(tokenize(chunk.text))),
             key=lambda item: (-item[1], item[0].chunk_id),
         )
         return [Hit(chunk=chunk, score=score, source="bm25") for chunk, score in ranked[:k]]
