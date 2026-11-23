@@ -55,6 +55,7 @@ The public repository reproduces these capabilities through **newly written, ind
 | `fusion.py` | Reciprocal-rank fusion; injectable reranking |
 | `pipeline.py` | Hybrid candidate retrieval orchestration |
 | `hybrid.py` | Opt-in service-backed ingestion and question answering |
+| `llm_workflow.py` | Opt-in Ollama-backed structured technical, resources and risk review |
 | `structured_llm.py` | Pydantic JSON schema and evidence ID checks |
 | `workflow.py` | Independent, explainable example analysis stages |
 | `reports.py` | PDF review export |
