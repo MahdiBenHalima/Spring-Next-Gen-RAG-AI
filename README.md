@@ -67,6 +67,29 @@
 
 **Implementation note:** The architecture above describes the overall internship solution and the independently reconstructed public modules. The **offline demo** uses BM25 plus transparent example business logic; LLM, vector database and CrossEncoder integrations are optional and require local services. No private prompts, company data or internal pricing logic are reproduced.
 
+## My technical contributions
+
+- Designed document extraction and overlapping chunking for evidence-oriented tender analysis.
+- Worked on hybrid lexical and semantic retrieval using BM25, embeddings and PostgreSQL/pgvector, with CrossEncoder reranking.
+- Developed AI-assisted requirement extraction, technical review, resource estimation and risk analysis workflows.
+- Integrated the AI functionality through FastAPI and reviewable reporting.
+
+The public repository independently reconstructs these methods; it does not distribute original company source, business rules or production data.
+
+## Retrieval and structured analysis design
+
+The public chunker uses whitespace-aware segmentation with a default maximum of 1,200 characters and 200 characters of overlap. Each chunk carries tender, document and chunk identifiers for traceability.
+
+BM25 provides lexical relevance, while optional Ollama embeddings and pgvector provide semantic candidates. Reciprocal rank fusion combines the two ranked lists without treating their raw scores as comparable:
+
+```text
+RRF(d) = sum over retrieval lists [1 / (60 + rank(d))]
+```
+
+Duplicate chunk IDs within each ranked list are counted once. The public retrieval pipeline defaults to ten candidates per channel and five final results. An optional CrossEncoder jointly scores the query and candidate text for reranking. Results from an external vector store are additionally filtered by tender ID; this is not a substitute for authenticated tenant isolation.
+
+Structured LLM extraction parses JSON into typed Pydantic models and rejects cited evidence IDs absent from the provided context. This validates identifier membership, not factual entailment or completeness. Source text is treated as untrusted input; prompt-injection defenses are best effort. Human review remains mandatory.
+
 ## Technology stack
 
 | Layer | Technologies | Purpose |
@@ -175,6 +198,19 @@ Configure PostgreSQL with the **pgvector extension**, set `DATABASE_URL` and any
 - `rfp_ai.llm_workflow.analyze_with_ollama` — optional multi-stage structured LLM review with evidence-ID validation and human approval.
 
 These are **integration components, not an automatically deployed service**. They require an external database and models and are not exercised by the offline CI matrix. An evaluation dataset and system-level integration tests are needed before claiming retrieval or decision accuracy.
+
+## Evaluation methodology
+
+| Layer | Proposed evaluation | Public verification scope |
+| --- | --- | --- |
+| Retrieval | Recall@K, MRR, NDCG@K | Offline ranking and fusion tests |
+| Evidence grounding | Citation precision and entailment | Schema and evidence-ID validation, not entailment |
+| Requirement extraction | Precision, recall and F1 against annotated RFPs | Controlled test fixtures |
+| Resource and cost review | Error against approved estimates | Transparent fictional assumptions |
+| Decision support | Agreement with expert reviewers | Human-review-required workflow |
+| Service performance | Latency and throughput | No production benchmark claimed |
+
+A credible benchmark requires authorized, independently annotated RFPs and separate development and evaluation sets. Compare BM25-only, vector-only, fused and reranked retrieval under the same corpus and query set. No measured real-world retrieval or decision accuracy is asserted.
 
 ## Quality and reproducibility
 
